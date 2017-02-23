@@ -1272,14 +1272,23 @@ static void vimb_setup(void)
 
     /* Setup those files that are use multiple time during runtime */
     vb.files[FILES_CLOSED]     = util_get_filepath(path, "closed", FALSE);
+    g_free(path);
     vb.files[FILES_COOKIE]     = util_get_filepath(path, "cookies", FALSE);
+    g_free(path);
     vb.files[FILES_USER_STYLE] = util_get_filepath(path, "style.css", FALSE);
+    g_free(path);
     vb.files[FILES_SCRIPT]     = util_get_filepath(path, "scripts.js", FALSE);
+    g_free(path);
     vb.files[FILES_HISTORY]    = util_get_filepath(path, "history", FALSE);
+    g_free(path);
     vb.files[FILES_COMMAND]    = util_get_filepath(path, "command", FALSE);
+    g_free(path);
     vb.files[FILES_HSTS]       = util_get_filepath(path, "hsts", FALSE);
+    g_free(path);
     vb.files[FILES_BOOKMARK]   = util_get_filepath(path, "bookmark", FALSE);
+    g_free(path);
     vb.files[FILES_QUEUE]      = util_get_filepath(path, "queue", FALSE);
+    g_free(path);
     vb.files[FILES_SEARCH]     = util_get_filepath(path, "search", FALSE);
     g_free(path);
 
