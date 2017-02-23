@@ -134,7 +134,7 @@ char *util_get_file_contents(const char *filename, gsize *length)
 }
 
 /**
- * Buil the path from given directory and filename and checks if the file
+ * Build the path from given directory and filename and checks if the file
  * exists. If the file does not exists and the create option is not set, this
  * function returns NULL.
  * If the file exists or the create option was given the full generated path
