@@ -121,6 +121,7 @@ void setting_init(Client *c)
     setting_add(c, "webgl", TYPE_BOOLEAN, &off, webkit, 0, "enable-webgl");
     setting_add(c, "webinspector", TYPE_BOOLEAN, &on, webkit, 0, "enable-developer-extras");
     setting_add(c, "xssauditor", TYPE_BOOLEAN, &on, webkit, 0, "enable-xss-auditor");
+    setting_add(c, "accelerated-2d-canvas", TYPE_BOOLEAN, &on, webkit, 0, "enable-accelerated-2d-canvas");
 
     /* internal variables */
     setting_add(c, "stylesheet", TYPE_BOOLEAN, &on, user_style, 0, NULL);
