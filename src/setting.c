@@ -121,6 +121,20 @@ void setting_init(Client *c)
     setting_add(c, "webgl", TYPE_BOOLEAN, &off, webkit, 0, "enable-webgl");
     setting_add(c, "webinspector", TYPE_BOOLEAN, &on, webkit, 0, "enable-developer-extras");
     setting_add(c, "xssauditor", TYPE_BOOLEAN, &on, webkit, 0, "enable-xss-auditor");
+
+    /* requires webkit2 built with -DENABLE_ACCELERATED_2D_CANVAS=ON and
+     * cairo built with --enable-gl
+     * on my machine, webkit makes cairo crash during gl setup:
+     * #0  0x00007f746b8f29c4 cairo_gl_device_set_thread_aware (libcairo.so.2)
+     * #1  0x00007f7472cf6e43 _ZN7WebCore15ImageBufferData20createCairoGLSurfaceEv (libwebkit2gtk-4.0.so.37)
+     * #2  0x00007f7472cf7088 _ZN7WebCore11ImageBufferC2ERKNS_9FloatSizeEfNS_10ColorSpaceENS_13RenderingModeERb (libwebkit2gtk-4.0.so.37)
+     * #3  0x00007f74722ddbd8 _ZNK7WebCore17HTMLCanvasElement17createImageBufferEv (libwebkit2gtk-4.0.so.37)
+     * #4  0x00007f74722ddf55 _ZNK7WebCore17HTMLCanvasElement6bufferEv (libwebkit2gtk-4.0.so.37)
+     * #5  0x00007f74722de94c _ZNK7WebCore17HTMLCanvasElement14drawingContextEv (libwebkit2gtk-4.0.so.37)
+     * #6  0x00007f747238395e _ZNK7WebCore24CanvasRenderingContext2D14drawingContextEv (libwebkit2gtk-4.0.so.37)
+     * #7  0x00007f747238598a _ZN7WebCore24CanvasRenderingContext2D8fillRectEffff (libwebkit2gtk-4.0.so.37)
+     * #8  0x00007f747302b2b3 _ZN7WebCore51jsCanvasRenderingContext2DPrototypeFunctionFillRectEPN3JSC9ExecStateE (libwebkit2gtk-4.0.so.37)
+    */
     setting_add(c, "accelerated-2d-canvas", TYPE_BOOLEAN, &on, webkit, 0, "enable-accelerated-2d-canvas");
 
     /* internal variables */
