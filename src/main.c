@@ -81,6 +81,7 @@ static void on_webview_notify_uri(WebKitWebView *webview, GParamSpec *pspec,
 static void on_webview_ready_to_show(WebKitWebView *webview, Client *c);
 static gboolean on_webview_web_process_crashed(WebKitWebView *webview, Client *c);
 static void on_window_destroy(GtkWidget *window, Client *c);
+static gboolean on_window_delete_event(GtkWidget *window, Client *c);
 static gboolean quit(Client *c);
 static void read_from_stdin(Client *c);
 static void register_cleanup(Client *c);
@@ -450,7 +451,8 @@ void vb_modelabel_update(Client *c, const char *label)
 void vb_quit(Client *c, gboolean force)
 {
     /* if not forced quit - don't quit if there are still running downloads */
-    if (!force && c->state.downloads) {
+    if (true) {
+    /* if (!force && c->state.downloads) { */
         vb_echo_force(c, MSG_ERROR, TRUE, "Can't quit: there are running downloads");
         return;
     }
@@ -664,6 +666,7 @@ static Client *client_new(WebKitWebView *webview, gboolean show)
     g_object_connect(
             G_OBJECT(c->window),
             "signal::destroy", G_CALLBACK(on_window_destroy), c,
+            "signal::delete-event", G_CALLBACK(on_window_delete_event), c,
             "signal::key-press-event", G_CALLBACK(on_map_keypress), c,
             NULL);
 
@@ -1321,6 +1324,12 @@ static gboolean quit(Client *c)
 
     /* Remove this from the list of event sources. */
     return FALSE;
+}
+
+static gboolean  on_window_delete_event(GtkWidget *window, Client *c)
+{
+    /* vb_quit(c, false); */
+    return TRUE;
 }
 
 /**
