@@ -6,7 +6,7 @@ var hints = Object.freeze((function(){
         validHints = [],               /* holds the valid hinted elements matching the filter condition */
         activeHint,                    /* holds the active hint object */
         filterText = "",               /* holds the typed filter text */
-        filterNum  = 0,                /* holds the numeric filter */
+        filterKeys = "",               /* holds the typed filter hint-keys */
         /* TODO remove these classes and use the 'vimbhint' attribute for */
         /* styling the hints and labels - but this might break user */
         /* stylesheets that use the classes for styling */
@@ -66,7 +66,7 @@ var hints = Object.freeze((function(){
         hints      = [];
         validHints = [];
         filterText = "";
-        filterNum  = 0;
+        filterKeys = "";
     }
 
     function create() {
@@ -227,11 +227,34 @@ var hints = Object.freeze((function(){
         helper(window);
     }
 
+    function getMaxHintsSameLength(hintStringLength) {
+        if(hintStringLength <= 0) {
+            return 0;
+        }
+
+        return config.hintKeys.length ** hintStringLength;
+    }
+
+    function getMaxHints(hintStringMaxLength) {
+        var res = 0,
+            hintStringLength = hintStringMaxLength;
+
+        if(hintStringMaxLength <= 0) {
+            return 0;
+        }
+
+        while(hintStringLength > 0) {
+            res += getMaxHintsSameLength(hintStringLength);
+            hintStringLength--;
+        }
+
+        return res;
+    }
+
     function show(fireLast) {
         var i, hint, newIdx,
-            n       = 1,
-            matcher = getMatcher(filterText),
-            str     = getHintString(filterNum);
+            n       = 0,
+            matcher = getMatcher(filterText);
 
         if (config.hintNumSameLength) {
             /* get number of hints to be shown */
@@ -241,12 +264,14 @@ var hints = Object.freeze((function(){
                     hintCount++;
                 }
             }
-            /* increase starting point of hint numbers until there are */
-            /* enough available numbers */
-            var len = config.hintKeys.length;
-            while (n * (len - 1) < hintCount) {
-                n *= len;
+
+            /* find hint string length to describe all hints with same length */
+            var hintStringLen = 1;
+            while (getMaxHintsSameLength(hintStringLen) < hintCount) {
+                hintStringLen++;
             }
+            /* the n-th hint string is the first one to use */
+            n = getMaxHints(hintStringLen - 1);
         }
 
         /* clear the array of valid hints */
@@ -260,7 +285,7 @@ var hints = Object.freeze((function(){
                 /* assign the new hint number/letters as label to the hint */
                 hint.num = getHintString(n++);
                 /* check for number filter */
-                if (!filterNum || 0 === hint.num.indexOf(str)) {
+                if (!filterKeys.length || hint.num.indexOf(filterKeys) == 0) {
                     hint.show();
                     validHints.push(hint);
                 } else {
@@ -268,6 +293,7 @@ var hints = Object.freeze((function(){
                 }
             }
         }
+
         if (fireLast && config.followLast && validHints.length <= 1) {
             focusHint(0);
             return fire();
@@ -291,14 +317,14 @@ var hints = Object.freeze((function(){
         };
     }
 
-    /* Return the hint string for a given number based on configured hintkeys */
+    /* Returns the hint string for a given hint number based on hint-keys */
     function getHintString(n) {
         var res = [],
             len = config.hintKeys.length;
         do {
             res.push(config.hintKeys[n % len]);
-            n = Math.floor(n / len);
-        } while (n > 0);
+            n = Math.floor(n / len) - 1;
+        } while (n >= 0);
 
         return res.reverse().join("");
     }
@@ -349,7 +375,7 @@ var hints = Object.freeze((function(){
 
         if (config.keepOpen) {
             /* reset the filter number */
-            filterNum = 0;
+            filterKeys = "";
             show(false);
         } else {
             clear();
@@ -489,7 +515,7 @@ var hints = Object.freeze((function(){
         filter: function filter(text) {
             /* remove previously set number filters to make the filter */
             /* easier to understand for the users */
-            filterNum  = 0;
+            filterKeys = "";
             filterText = text || "";
             return show(true);
         },
@@ -497,12 +523,12 @@ var hints = Object.freeze((function(){
             var pos,
                 keys = config.hintKeys;
             /* delete last filter number digit */
-            if (null === n && filterNum) {
-                filterNum = Math.floor(filterNum / keys.length);
+            if (null === n && filterKeys.length) {
+                filterKeys = filterKeys.slice(0, -1);
                 return show(false);
             }
             if ((pos = keys.indexOf(n)) >= 0) {
-                filterNum = filterNum * keys.length + pos;
+                filterKeys = filterKeys + n;
                 return show(true);
             }
             return "ERROR:";
